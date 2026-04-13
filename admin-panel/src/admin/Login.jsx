@@ -11,6 +11,7 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [timeoutMessage, setTimeoutMessage] = useState('');
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -18,6 +19,12 @@ const Login = () => {
         e.preventDefault();
         setError('');
         setLoading(true);
+        setTimeoutMessage('');
+
+        // Show a message after 4 seconds if the Render free-tier is taking time to wake up
+        const slowServerTimer = setTimeout(() => {
+            setTimeoutMessage("Waking up secure servers... This may take up to 50 seconds on first load.");
+        }, 4000);
 
         const fetchURL = `${API_BASE_URL}/login`;
         console.log("Attempting login at:", fetchURL);
@@ -31,6 +38,9 @@ const Login = () => {
 
             console.log("Response Status:", response.status);
             const data = await response.json();
+            
+            clearTimeout(slowServerTimer);
+            setTimeoutMessage('');
 
             if (response.ok) {
                 setIsSuccess(true);
@@ -43,6 +53,8 @@ const Login = () => {
                 setLoading(false);
             }
         } catch (err) {
+            clearTimeout(slowServerTimer);
+            setTimeoutMessage('');
             console.error("Login Error Details:", err);
             setError('Server connection failed. Please check if backend is running.');
             setLoading(false);
@@ -123,6 +135,11 @@ const Login = () => {
                                     </>
                                 )}
                             </button>
+                            {timeoutMessage && (
+                                <div className="mt-4 p-3 rounded-xl bg-orange-50 text-orange-600 text-xs text-center font-bold dark:bg-orange-900/20 dark:text-orange-400 animate-in fade-in duration-300 border border-orange-100 dark:border-orange-900/20">
+                                    {timeoutMessage}
+                                </div>
+                            )}
                         </form>
                     ) : (
                         <div className="text-center py-10 animate-in zoom-in duration-500">
