@@ -229,7 +229,9 @@ const TCManager = () => {
                                                                 ? `${WEBSITE_URL}${tc.imageFile.replace('/uploads/Gallery/', '/Gallery/')}`
                                                                 : tc.imageFile.startsWith('/uploads/') 
                                                                     ? `${API_IMAGE_URL}${tc.imageFile}`
-                                                                    : `${API_IMAGE_URL}${tc.imageFile.startsWith('/') ? '' : '/'}${tc.imageFile}`)} 
+                                                                    : (!tc.imageFile.startsWith('/') && !tc.imageFile.includes('/'))
+                                                                        ? `${WEBSITE_URL}/Gallery/TC/${tc.imageFile}`
+                                                                        : `${API_IMAGE_URL}${tc.imageFile.startsWith('/') ? '' : '/'}${tc.imageFile}`)} 
                                                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
                                                         alt={tc?.studentName || 'Student'}
                                                         onError={(e) => {
@@ -342,7 +344,9 @@ const TCManager = () => {
                                                     ? `${WEBSITE_URL}${editTC.imageFile.replace('/uploads/Gallery/', '/Gallery/')}`
                                                     : editTC.imageFile.startsWith('/uploads/') 
                                                         ? `${API_IMAGE_URL}${editTC.imageFile}`
-                                                        : `${API_IMAGE_URL}${editTC.imageFile.startsWith('/') ? '' : '/'}${editTC.imageFile}`)} 
+                                                        : (!editTC.imageFile.startsWith('/') && !editTC.imageFile.includes('/'))
+                                                            ? `${WEBSITE_URL}/Gallery/TC/${editTC.imageFile}`
+                                                            : `${API_IMAGE_URL}${editTC.imageFile.startsWith('/') ? '' : '/'}${editTC.imageFile}`)} 
                                             className="w-full h-full object-cover" 
                                         />
                                     ) : (
