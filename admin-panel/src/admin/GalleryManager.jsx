@@ -9,7 +9,9 @@ import {
   CheckCircle2,
   Search,
   Edit,
-  RefreshCw
+  RefreshCw,
+  Clock,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../hooks/AuthContext';
 
