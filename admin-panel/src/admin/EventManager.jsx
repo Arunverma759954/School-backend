@@ -110,7 +110,7 @@ const EventManager = () => {
     const closeModal = () => {
         setIsModalOpen(false);
         setEditEvent(null);
-        setNewEvent({ title: '', date: '', location: 'School Campus', description: '', category: 'General' });
+        setNewEvent({ title: '', date: '', location: 'School Campus', description: '', category: 'General', link: '' });
     };
 
     return (
@@ -272,7 +272,6 @@ const EventManager = () => {
                                     />
                                 </div>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Category</label>
                                 <select 
@@ -286,6 +285,17 @@ const EventManager = () => {
                                     <option value="Cultural">Cultural</option>
                                     <option value="Holiday">Holiday</option>
                                 </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Event Link (Optional)</label>
+                                <input 
+                                    type="url" 
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-5 py-4 font-bold text-[13px] text-slate-900 dark:text-white outline-none focus:border-[#8B0000] transition-all"
+                                    placeholder="https://example.com/event-details"
+                                    value={editEvent ? (editEvent.link || '') : newEvent.link}
+                                    onChange={(e) => editEvent ? setEditEvent({...editEvent, link: e.target.value}) : setNewEvent({...newEvent, link: e.target.value})}
+                                />
                             </div>
 
                             <div className="flex gap-4 pt-4">

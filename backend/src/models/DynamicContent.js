@@ -5,7 +5,8 @@ const eventSchema = new mongoose.Schema({
     date: { type: Date, required: true },
     location: { type: String, default: 'School Campus' },
     description: { type: String },
-    category: { type: String, default: 'General' }
+    category: { type: String, default: 'General' },
+    link: { type: String }
 }, { timestamps: true });
 
 const Event = mongoose.model('Event', eventSchema);
