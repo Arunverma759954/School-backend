@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import path from 'path';
+import fs from 'fs';
 import connectDB from './config/db.js';
 
 // Routes
@@ -58,7 +59,6 @@ app.get('/', (req, res) => {
 });
 
 // Diagnostic route
-import fs from 'fs';
 app.get('/api/debug-files', (req, res) => {
     try {
         const files = fs.readdirSync(uploadPath);
