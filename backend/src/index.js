@@ -41,18 +41,13 @@ app.use('/api', dynamicRoutes);
 const uploadPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadPath));
 
-// Mount the website public folder content
-const repoRoot = path.resolve(__dirname, '../../../');
-const publicPath = path.join(repoRoot, 'public');
-
-// 👉 Legcay Gallery assets from public
-app.use('/Gallery', express.static(path.join(publicPath, 'Gallery')));
-
-// 👉 Root static (placed last to prevent API interference)
-app.use('/', express.static(publicPath));
+// 👉 Legacy Gallery assets (now bundled in uploads for portability)
+// This ensures images work in production Vercel environments
+const galleryPath = path.join(uploadPath, 'Gallery');
+app.use('/Gallery', express.static(galleryPath));
 
 app.get('/', (req, res) => {
-    res.send('Professional API is running... v12');
+    res.send('Professional API is running... v15 STABLE - PROPER DEPLOY');
 });
 
 // Diagnostic route
