@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/AuthContext';
 
-import { API_BASE_URL, API_IMAGE_URL, WEBSITE_URL } from '../constants';
+import { API_BASE_URL, API_IMAGE_URL, getImageUrl, getFallbackImageUrl } from '../constants';
 
 const TCManager = () => {
     const [tcs, setTcs] = useState([]);
@@ -270,13 +270,7 @@ const TCManager = () => {
                                                         })()}
                                                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                                                         alt={tc?.studentName || 'Student'}
-                                                        onError={(e) => {
-                                                            e.target.style.display = 'none';
-                                                            const iconDiv = document.createElement('div');
-                                                            iconDiv.className = 'absolute inset-0 flex items-center justify-center text-slate-300';
-                                                            iconDiv.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>';
-                                                            e.target.parentElement.appendChild(iconDiv);
-                                                        }}
+                                                        onError={(e) => getFallbackImageUrl(e, tc.imageFile)}
                                                     />
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center text-slate-300">

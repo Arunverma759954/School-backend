@@ -8,13 +8,43 @@ export const getImageUrl = (src) => {
     
     let path = src;
     
-    // Normalize path: everything in the database should be treated as arriving from the backend's /uploads
-    // If it already has /uploads/, leave it. If not, add it.
+    // Normalize path to backend style
     if (!path.startsWith('/uploads/')) {
         path = `/uploads${path.startsWith('/') ? '' : '/'}${path}`;
     }
 
+    // Step 1: Default to live backend
     return `${API_IMAGE_URL}${path}`;
+};
+
+// Error handler for images to try fallbacks
+export const getFallbackImageUrl = (e, src) => {
+    const fallbacks = [
+        'https://school-web-sandy.vercel.app',
+        'https://school-web-rho-drab.vercel.app',
+        'https://school-web-alpha.vercel.app',
+        'https://school-web.vercel.app'
+    ];
+    
+    // If it already failed, try to inject a fallback domain
+    let path = src;
+    if (path.startsWith('/uploads/Gallery/')) {
+        path = path.replace('/uploads/Gallery/', '/Gallery/');
+    } else if (path.startsWith('/uploads/')) {
+        // do nothing
+    }
+
+    // This is used in onError
+    const currentAttempt = e.target.getAttribute('data-attempt') || '0';
+    const attemptIdx = parseInt(currentAttempt);
+    
+    if (attemptIdx < fallbacks.length) {
+        e.target.setAttribute('data-attempt', (attemptIdx + 1).toString());
+        e.target.src = `${fallbacks[attemptIdx]}${path}`;
+    } else {
+        // Final fallback: hide or show icon
+        e.target.style.display = 'none';
+    }
 };
 
 console.log('Final API_BASE_URL resolved to:', API_BASE_URL);

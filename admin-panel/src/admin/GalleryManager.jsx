@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../hooks/AuthContext';
 
-import { API_BASE_URL, API_IMAGE_URL, WEBSITE_URL } from '../constants';
+import { API_BASE_URL, API_IMAGE_URL, WEBSITE_URL, getImageUrl, getFallbackImageUrl } from '../constants';
 
 const GalleryManager = () => {
     const [images, setImages] = useState([]);
@@ -327,9 +327,7 @@ const GalleryManager = () => {
                                                 alt={img.alt} 
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 loading="lazy"
-                                                onError={(e) => {
-                                                    // e.target.style.display = 'none'; // Removed hiding for better debugging
-                                                }}
+                                                onError={(e) => getFallbackImageUrl(e, img.src)}
                                             />
                                             <button 
                                                 onClick={() => setSelectedImg(img)}
