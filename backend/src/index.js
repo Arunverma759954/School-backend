@@ -32,6 +32,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Routes Middleware
+app.use('/api', authRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api', dynamicRoutes);
+
 // Static folder for professional uploads
 const uploadPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadPath));
@@ -42,20 +47,17 @@ console.log('Serving uploads from:', uploadPath);
 const repoRoot = path.resolve(__dirname, '../../../');
 const publicPath = path.join(repoRoot, 'public');
 console.log('Mounting website public folder from:', publicPath);
-app.use('/', express.static(publicPath));
+
+// 👉 API routes Priority: Move static below to prevent interference
 app.use('/Gallery', express.static(path.join(publicPath, 'Gallery')));
 app.use('/uploads/Gallery', express.static(path.join(publicPath, 'Gallery')));
-// Also alias root images like pta1.webp if they were uploaded to /uploads/
 app.use('/uploads', express.static(path.join(publicPath))); 
 app.use('/uploads', express.static(uploadPath)); // Keep original uploads too
+app.use('/', express.static(publicPath));
 
-// Routes Middleware
-app.use('/api', authRoutes);
-app.use('/api/gallery', galleryRoutes);
-app.use('/api', dynamicRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Professional API is running...');
+    res.send('Professional API is running... v11');
 });
 
 // Diagnostic route
