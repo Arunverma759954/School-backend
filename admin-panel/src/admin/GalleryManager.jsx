@@ -11,7 +11,8 @@ import {
   Edit,
   RefreshCw,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Camera
 } from 'lucide-react';
 import { useAuth } from '../hooks/AuthContext';
 
