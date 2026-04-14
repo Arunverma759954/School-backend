@@ -50,6 +50,24 @@ app.get('/', (req, res) => {
     res.send('Professional API is running...');
 });
 
+// Diagnostic route
+import fs from 'fs';
+app.get('/api/debug-files', (req, res) => {
+    try {
+        const files = fs.readdirSync(uploadPath);
+        const galleryFiles = fs.existsSync(path.join(uploadPath, 'Gallery')) 
+            ? fs.readdirSync(path.join(uploadPath, 'Gallery'))
+            : 'Gallery folder MISSING';
+        res.json({
+            uploadPath,
+            files,
+            galleryFiles
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
