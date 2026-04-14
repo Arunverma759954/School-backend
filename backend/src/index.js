@@ -37,9 +37,16 @@ app.use('/uploads', express.static(uploadPath));
 console.log('Serving uploads from:', uploadPath);
 
 // Mount the entire public folder of the website at the root
-// This will naturally serve /Gallery/..., /pta1.webp, etc.
-const publicPath = path.join(process.cwd(), '../../public');
+// Using absolute path resolving to ensure it works on Render
+const repoRoot = path.resolve(__dirname, '../../../');
+const publicPath = path.join(repoRoot, 'public');
+console.log('Mounting website public folder from:', publicPath);
 app.use('/', express.static(publicPath));
+app.use('/Gallery', express.static(path.join(publicPath, 'Gallery')));
+app.use('/uploads/Gallery', express.static(path.join(publicPath, 'Gallery')));
+// Also alias root images like pta1.webp if they were uploaded to /uploads/
+app.use('/uploads', express.static(path.join(publicPath))); 
+app.use('/uploads', express.static(uploadPath)); // Keep original uploads too
 
 // Routes Middleware
 app.use('/api', authRoutes);
