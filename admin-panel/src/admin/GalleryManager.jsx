@@ -130,25 +130,18 @@ const GalleryManager = () => {
                 return;
             }
 
-            // Convert file to base64 - stores permanently in MongoDB
-            const base64 = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('alt', newImageData.alt || 'School Media');
+            formData.append('category', newImageData.category || 'General');
 
             const res = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 
-                    'Authorization': `Bearer ${user?.token}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${user?.token}`
+                    // No Content-Type - let browser set multipart boundary
                 },
-                body: JSON.stringify({
-                    src: base64,
-                    alt: newImageData.alt || 'School Media',
-                    category: newImageData.category || 'General'
-                })
+                body: formData
             });
 
             const data = await res.json();
@@ -184,31 +177,20 @@ const GalleryManager = () => {
         setIsUploading(true);
 
         try {
-            let newSrc = undefined;
+            const formData = new FormData();
+            formData.append('alt', editingImage.alt);
+            formData.append('category', editingImage.category);
 
-            // If a new file was selected, convert to base64
             if (editingImage.newFile) {
-                newSrc = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(editingImage.newFile);
-                });
+                formData.append('image', editingImage.newFile);
             }
-
-            const payload = {
-                alt: editingImage.alt,
-                category: editingImage.category,
-            };
-            if (newSrc) payload.src = newSrc;
 
             const res = await fetch(`${API_URL}/${editingImage._id}`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${user?.token}`,
-                    'Content-Type': 'application/json'
+                headers: { 
+                    Authorization: `Bearer ${user?.token}`
                 },
-                body: JSON.stringify(payload)
+                body: formData
             });
 
             const responseText = await res.text();

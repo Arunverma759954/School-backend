@@ -1,4 +1,5 @@
 import Gallery from '../models/Gallery.js';
+import { cloudinary } from '../config/cloudinary.js';
 
 // @desc    Get all gallery images
 // @route   GET /api/gallery
@@ -12,19 +13,32 @@ const getGallery = async (req, res) => {
     }
 };
 
-// @desc    Add new gallery image (base64 stored in MongoDB)
+// @desc    Add new gallery image (uploaded to Cloudinary CDN)
 // @route   POST /api/gallery
 // @access  Private/Admin
 const addGallery = async (req, res) => {
     try {
-        const { alt, category, src } = req.body;
+        const { alt, category } = req.body;
+        let finalSrc = '';
 
-        if (!src) {
+        // Priority 1: Multer-Cloudinary file upload (req.file.path = cloudinary URL)
+        if (req.file && req.file.path) {
+            finalSrc = req.file.path;
+        }
+        // Priority 2: Base64 fallback - upload directly to Cloudinary
+        else if (req.body.src && req.body.src.startsWith('data:image')) {
+            const result = await cloudinary.uploader.upload(req.body.src, {
+                folder: 'school-gallery',
+            });
+            finalSrc = result.secure_url;
+        }
+
+        if (!finalSrc) {
             return res.status(400).json({ message: 'No image provided' });
         }
 
         const image = await Gallery.create({
-            src,     // base64 data URL e.g. "data:image/jpeg;base64,/9j/4AAQ..."
+            src: finalSrc,  // Cloudinary permanent https:// URL
             alt: alt || 'School Gallery Image',
             category: category || 'General',
         });
@@ -45,7 +59,20 @@ const addGallery = async (req, res) => {
 const deleteGallery = async (req, res) => {
     try {
         const image = await Gallery.findById(req.params.id);
+
         if (image) {
+            // Delete from Cloudinary if it's a Cloudinary URL
+            if (image.src && image.src.includes('cloudinary.com')) {
+                try {
+                    const parts = image.src.split('/');
+                    const fileWithExt = parts[parts.length - 1];
+                    const folder = parts[parts.length - 2];
+                    const publicId = `${folder}/${fileWithExt.split('.')[0]}`;
+                    await cloudinary.uploader.destroy(publicId);
+                } catch (cloudErr) {
+                    console.warn('Cloudinary delete warning:', cloudErr.message);
+                }
+            }
             await image.deleteOne();
             res.json({ message: 'Image removed' });
         } else {
@@ -61,15 +88,18 @@ const deleteGallery = async (req, res) => {
 // @access  Private/Admin
 const updateGallery = async (req, res) => {
     try {
-        const { alt, category, src } = req.body;
+        const { alt, category } = req.body;
         const image = await Gallery.findById(req.params.id);
 
         if (image) {
             image.alt = alt || image.alt;
             image.category = category || image.category;
-            if (src) {
-                image.src = src; // update with new base64 if provided
+
+            // If new file uploaded, update with new Cloudinary URL
+            if (req.file && req.file.path) {
+                image.src = req.file.path;
             }
+
             const updatedImage = await image.save();
             res.json(updatedImage);
         } else {
