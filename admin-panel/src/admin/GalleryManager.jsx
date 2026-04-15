@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Plus, 
-  Trash2, 
-  Image as ImageIcon, 
-  Maximize2, 
-  X, 
-  Upload,
-  CheckCircle2,
-  Search,
-  Edit,
-  RefreshCw,
-  Clock,
-  AlertCircle,
-  Camera
+import {
+    Plus,
+    Trash2,
+    Image as ImageIcon,
+    Maximize2,
+    X,
+    Upload,
+    CheckCircle2,
+    Search,
+    Edit,
+    RefreshCw,
+    Clock,
+    AlertCircle,
+    Camera
 } from 'lucide-react';
 import { useAuth } from '../hooks/AuthContext';
 
@@ -25,7 +25,7 @@ const GalleryManager = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const { user } = useAuth();
-    
+
     // Upload Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -39,16 +39,20 @@ const GalleryManager = () => {
 
 
     const categories = [
-        'All', 'Annual Function', 'Competition', 'Sports', 'Yoga', 
-        'Campus Life', 'Student Activities', 'Training', 'PTA', 
+        'All', 'Annual Function', 'Competition', 'Sports', 'Yoga',
+        'Campus Life', 'Student Activities', 'Training', 'PTA',
         'Teacher Picnic', 'Republic Day', 'General'
     ];
+
 
     const fetchImages = async () => {
         setIsLoading(true);
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
+
+            console.log("IMAGES DATA:", data);
+
             setImages(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch gallery:", error);
@@ -57,7 +61,6 @@ const GalleryManager = () => {
             setIsLoading(false);
         }
     };
-
     useEffect(() => {
         fetchImages();
     }, []);
@@ -73,26 +76,28 @@ const GalleryManager = () => {
     const handleDelete = async () => {
         const idToDelete = deleteId;
         if (!idToDelete) return;
-        
+
         try {
             const res = await fetch(`${API_URL}/${idToDelete}`, {
                 method: 'DELETE',
-                headers: { 
+                headers: {
                     'Authorization': `Bearer ${user?.token}`
                 }
             });
-            
+
             if (res.ok || res.status === 404) {
                 setImages(prev => prev.filter(img => String(img._id) !== String(idToDelete)));
                 setDeleteId(null);
-                
+
                 if (res.ok) addNotification('Gallery asset removed');
                 else addNotification('Asset already removed', 'info');
 
                 // Force sync
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                // setTimeout(() => {
+                //     window.location.reload();
+                // }, 500);
+
+
             } else {
                 addNotification('Server rejected deletion', 'error');
                 setDeleteId(null);
@@ -119,11 +124,11 @@ const GalleryManager = () => {
 
     const handlePublish = async () => {
         setIsUploading(true);
-        
+
         try {
             const fileInput = document.getElementById('gallery-file-input');
             const file = fileInput.files[0];
-            
+
             if (!file) {
                 addNotification('Please select a file first', 'error');
                 setIsUploading(false);
@@ -137,7 +142,7 @@ const GalleryManager = () => {
 
             const res = await fetch(API_URL, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Authorization': `Bearer ${user?.token}`
                     // No Content-Type - let browser set multipart boundary
                 },
@@ -145,7 +150,7 @@ const GalleryManager = () => {
             });
 
             const data = await res.json();
-            
+
             setIsUploading(false);
             if (res.ok) {
                 setImages(prev => [data, ...prev]);
@@ -187,7 +192,7 @@ const GalleryManager = () => {
 
             const res = await fetch(`${API_URL}/${editingImage._id}`, {
                 method: 'PUT',
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${user?.token}`
                 },
                 body: formData
@@ -213,8 +218,8 @@ const GalleryManager = () => {
         }
     };
 
-    const filteredImages = filterCategory === 'All' 
-        ? images 
+    const filteredImages = filterCategory === 'All'
+        ? images
         : images.filter(img => img.category === filterCategory);
 
     if (isLoading) {
@@ -237,10 +242,10 @@ const GalleryManager = () => {
     return (
         <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20">
             {/* Hidden Input */}
-            <input 
-                type="file" 
-                id="gallery-file-input" 
-                className="hidden" 
+            <input
+                type="file"
+                id="gallery-file-input"
+                className="hidden"
                 accept="image/*"
                 onChange={handleFileChange}
             />
@@ -263,15 +268,15 @@ const GalleryManager = () => {
                         </h2>
                         <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[7px] mt-1.5 opacity-60">Professional Asset Management Console</p>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
-                        <button 
+                        <button
                             onClick={fetchImages}
                             className="p-3.5 bg-slate-50 dark:bg-slate-800 text-slate-400 rounded-xl hover:bg-white dark:hover:bg-slate-700 hover:text-[#8B0000] transition-all border border-slate-100 dark:border-slate-700 group"
                         >
                             <RefreshCw size={18} className="group-active:rotate-180 transition-transform duration-500" />
                         </button>
-                        <button 
+                        <button
                             onClick={() => setIsModalOpen(true)}
                             className="flex items-center gap-3 bg-[#8B0000] hover:bg-red-950 text-white px-6 py-3.5 rounded-xl font-bold text-[10px] tracking-widest shadow-lg shadow-rose-100 dark:shadow-none transition-all active:scale-95 group border-b-4 border-red-950"
                         >
@@ -287,7 +292,7 @@ const GalleryManager = () => {
                 <div className="md:col-span-8 flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative group">
                         <ImageIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#8B0000] transition-colors" size={20} />
-                        <select 
+                        <select
                             className="w-full bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border-2 border-slate-100 dark:border-slate-800 rounded-3xl pl-16 pr-8 py-5 font-bold text-[11px] text-slate-900 dark:text-white uppercase tracking-widest outline-none focus:border-[#8B0000] transition-all appearance-none cursor-pointer"
                             value={filterCategory}
                             onChange={(e) => setFilterCategory(e.target.value)}
@@ -327,25 +332,21 @@ const GalleryManager = () => {
                                 <tr key={img._id} className="group hover:bg-slate-50/50 dark:hover:bg-white/5 transition-all duration-300">
                                     <td className="px-8 py-6">
                                         <div className="relative h-20 w-32 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm group-hover:shadow-xl transition-all group-hover:-translate-y-1">
-                                            <img 
-                                                src={(() => {
-                                                    if (!img.src) return '';
-                                                    // base64 or full http URL — use directly
-                                                    if (img.src.startsWith('data:') || img.src.startsWith('http')) return img.src;
-                                                    // Legacy /uploads/ path
-                                                    return `${API_IMAGE_URL}${img.src}`;
-                                                })()} 
-                                                alt={img.alt} 
+
+                                            <img
+                                                src={getImageUrl(img.src)}   // ✅ BEST
+                                                alt={img.alt}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                loading="lazy"
                                                 onError={(e) => getFallbackImageUrl(e, img.src)}
                                             />
-                                            <button 
+
+                                            <button
                                                 onClick={() => setSelectedImg(img)}
                                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
                                             >
                                                 <Maximize2 size={16} />
                                             </button>
+
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
@@ -367,7 +368,7 @@ const GalleryManager = () => {
                                     </td>
                                     <td className="px-8 py-6 text-right">
                                         <div className="flex items-center justify-end gap-3 transition-opacity">
-                                            <button 
+                                            <button
                                                 onClick={() => {
                                                     setEditingImage(img);
                                                     setIsEditModalOpen(true);
@@ -377,14 +378,14 @@ const GalleryManager = () => {
                                             >
                                                 <Edit size={16} />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => setSelectedImg(img)}
                                                 className="p-3 bg-white dark:bg-slate-800 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm active:scale-95 border border-slate-100 dark:border-slate-800"
                                                 title="Full Preview"
                                             >
                                                 <Maximize2 size={16} />
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => setDeleteId(img._id)}
                                                 className="p-3 bg-white dark:bg-slate-800 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm active:scale-95 border border-slate-100 dark:border-slate-800"
                                                 title="Delete Asset"
@@ -397,7 +398,7 @@ const GalleryManager = () => {
                             ))}
                         </tbody>
                     </table>
-                    
+
                     {filteredImages.length === 0 && (
                         <div className="py-32 text-center bg-slate-50/50 dark:bg-slate-800/10">
                             <ImageIcon className="w-20 h-20 text-slate-200 dark:text-slate-800 mx-auto mb-6" />
@@ -423,7 +424,7 @@ const GalleryManager = () => {
                         </div>
 
                         <div className="p-8 pb-10 space-y-6">
-                            <div 
+                            <div
                                 className="relative aspect-video rounded-3xl overflow-hidden bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 group cursor-pointer hover:border-sky-500 transition-all font-sans"
                                 onClick={triggerFileSelect}
                             >
@@ -445,19 +446,19 @@ const GalleryManager = () => {
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
                                     <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest px-1">Label Name</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-[12px] text-slate-900 dark:text-white outline-none focus:border-[#8B0000] transition-all"
                                         value={newImageData.alt}
-                                        onChange={(e) => setNewImageData({...newImageData, alt: e.target.value})}
+                                        onChange={(e) => setNewImageData({ ...newImageData, alt: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest px-1">Category Sector</label>
-                                    <select 
+                                    <select
                                         className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-50 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-[12px] text-slate-900 dark:text-white outline-none focus:border-[#8B0000] transition-all cursor-pointer appearance-none"
                                         value={newImageData.category}
-                                        onChange={(e) => setNewImageData({...newImageData, category: e.target.value})}
+                                        onChange={(e) => setNewImageData({ ...newImageData, category: e.target.value })}
                                     >
                                         {categories.filter(c => c !== 'All').map(cat => (
                                             <option key={cat} value={cat}>{cat.toUpperCase()}</option>
@@ -476,11 +477,11 @@ const GalleryManager = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Edit Modal */}
             {isEditModalOpen && editingImage && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-                    <div 
+                    <div
                         className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-500"
                         onClick={() => setIsEditModalOpen(false)}
                     ></div>
@@ -494,24 +495,24 @@ const GalleryManager = () => {
                         </div>
 
                         <div className="p-8 space-y-8">
-                            <div 
+                            <div
                                 className="relative aspect-video rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm group cursor-pointer"
                                 onClick={() => document.getElementById('edit-gallery-file-input').click()}
                             >
-                                <img 
-                                    src={previewUrl || getImageUrl(editingImage.src)} 
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                                    alt="Preview" 
+                                <img
+                                    src={previewUrl || getImageUrl(editingImage.src)}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    alt="Preview"
                                     onError={(e) => getFallbackImageUrl(e, editingImage.src)}
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-2">
                                     <Camera size={32} />
                                     <span className="text-[10px] font-bold uppercase tracking-widest">Change Photo</span>
                                 </div>
-                                <input 
-                                    type="file" 
-                                    id="edit-gallery-file-input" 
-                                    className="hidden" 
+                                <input
+                                    type="file"
+                                    id="edit-gallery-file-input"
+                                    className="hidden"
                                     accept="image/*"
                                     onChange={handleEditFileChange}
                                 />
@@ -520,19 +521,19 @@ const GalleryManager = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Media Label</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-5 py-4 font-bold text-[13px] text-slate-900 dark:text-white outline-none focus:border-[#8B0000] transition-all"
                                         value={editingImage.alt}
-                                        onChange={(e) => setEditingImage({...editingImage, alt: e.target.value})}
+                                        onChange={(e) => setEditingImage({ ...editingImage, alt: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Sector Category</label>
-                                    <select 
+                                    <select
                                         className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-5 py-4 font-bold text-[13px] text-slate-900 dark:text-white outline-none focus:border-[#8B0000] transition-all cursor-pointer appearance-none"
                                         value={editingImage.category}
-                                        onChange={(e) => setEditingImage({...editingImage, category: e.target.value})}
+                                        onChange={(e) => setEditingImage({ ...editingImage, category: e.target.value })}
                                     >
                                         {categories.filter(c => c !== 'All').map(cat => (
                                             <option key={cat} value={cat}>{cat.toUpperCase()}</option>
@@ -543,13 +544,13 @@ const GalleryManager = () => {
                         </div>
 
                         <div className="px-8 py-6 bg-slate-50/50 dark:bg-slate-800/50 flex gap-4 border-t border-slate-100 dark:border-slate-800">
-                            <button 
+                            <button
                                 onClick={() => setIsEditModalOpen(false)}
                                 className="flex-1 bg-white dark:bg-slate-900 text-slate-400 font-bold py-4 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-200 dark:border-slate-700 tracking-widest text-[10px]"
                             >
                                 CANCEL
                             </button>
-                            <button 
+                            <button
                                 onClick={handleUpdate}
                                 disabled={isUploading || !editingImage.alt}
                                 className="flex-[2] bg-[#8B0000] hover:bg-red-950 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 border-b-4 border-sky-800 tracking-widest text-[10px]"
@@ -574,7 +575,7 @@ const GalleryManager = () => {
             {/* Fullscreen Lightbox */}
             {selectedImg && (
                 <div className="fixed inset-0 z-[150] bg-slate-950/98 flex items-center justify-center p-4 sm:p-20 animate-in fade-in duration-500 backdrop-blur-3xl">
-                    <button 
+                    <button
                         onClick={() => setSelectedImg(null)}
                         className="absolute top-10 right-10 p-6 bg-white/5 hover:bg-white/10 text-white rounded-[2rem] transition-all border border-white/10 hover:scale-110"
                     >
@@ -583,18 +584,11 @@ const GalleryManager = () => {
                     <div className="max-w-7xl w-full h-full flex flex-col items-center justify-center gap-12">
                         <div className="relative group">
                             <div className="absolute -inset-4 bg-white/10 rounded-[3.5rem] blur-3xl opacity-0 group-hover:opacity-100 transition duration-700"></div>
-                             <img 
-                                 src={(() => {
-                                     if (!selectedImg.src) return '';
-                                     if (selectedImg.src.startsWith('http') || selectedImg.src.startsWith('data:')) return selectedImg.src;
-                                     let path = selectedImg.src;
-                                     // All /uploads/ paths must point to the backend server
-                                     return encodeURI(path.startsWith('/') 
-                                         ? `${API_IMAGE_URL}${path}` 
-                                         : `${API_IMAGE_URL}/uploads/Gallery/${path}`);
-                                 })()} 
-                                alt={selectedImg.alt} 
+                            <img
+                                src={getImageUrl(selectedImg.src)}
+                                alt={selectedImg.alt}
                                 className="relative max-h-[70vh] max-w-full rounded-[3rem] shadow-[0_0_100px_rgba(255,255,255,0.1)] object-contain border-4 border-white/10 animate-in zoom-in-95 duration-1000"
+                                onError={(e) => getFallbackImageUrl(e, selectedImg.src)}
                             />
                         </div>
                         <div className="text-center">
@@ -629,7 +623,7 @@ const GalleryManager = () => {
                             </div>
                             <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-4">Confirm Deletion?</h3>
                             <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-10 leading-relaxed">This record will be permanently purged from the registry.</p>
-                            
+
                             <div className="flex gap-4">
                                 <button onClick={() => setDeleteId(null)} className="flex-1 px-8 py-4 bg-slate-50 dark:bg-slate-800 text-slate-400 font-bold rounded-2xl text-[10px] uppercase tracking-[0.2em] hover:bg-slate-100 transition-all">Cancel</button>
                                 <button onClick={handleDelete} className="flex-1 px-8 py-4 bg-[#8B0000] text-white font-bold rounded-2xl text-[10px] uppercase tracking-[0.2em] hover:bg-red-700 shadow-xl shadow-rose-200/20 transition-all active:scale-95">Purge Now</button>

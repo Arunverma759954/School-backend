@@ -38,13 +38,13 @@ app.use('/api', authRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api', dynamicRoutes);
 
-// Static folder for professional uploads (ONLY ONE)
+// ✅ THIS IS THE FIX (Static File Serving)
+// Ensure both Express paths properly expose the uploads directory
 const uploadPath = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadPath));
 
-// 👉 Legacy Gallery assets (now bundled in uploads for portability)
-// This ensures images work in production Vercel environments
-const galleryPath = path.join(uploadPath, 'Gallery');
+// Ensure legacy frontend routes match
+const galleryPath = path.join(__dirname, 'uploads', 'Gallery');
 app.use('/Gallery', express.static(galleryPath));
 
 app.get('/', (req, res) => {
