@@ -193,16 +193,7 @@ const GalleryManager = () => {
                 body: formData
             });
 
-            const responseText = await res.text();
-            let data;
-            try {
-                data = JSON.parse(responseText);
-            } catch (parseError) {
-                console.error('Backend returned non-JSON:', responseText);
-                addNotification('Server returned an invalid response. Please check backend logs.', 'error');
-                setIsUploading(false);
-                return;
-            }
+            const data = await res.json();
 
             if (res.ok) {
                 setImages(prev => prev.map(img => img._id === data._id ? data : img));
