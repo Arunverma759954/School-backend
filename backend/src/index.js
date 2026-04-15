@@ -22,6 +22,7 @@ const app = express();
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: false,
+    contentSecurityPolicy: false,
 }));
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
